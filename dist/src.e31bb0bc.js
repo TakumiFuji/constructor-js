@@ -117,57 +117,145 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"model.js":[function(require,module,exports) {
+})({"assets/image.jpg":[function(require,module,exports) {
+module.exports = "/image.70feebc7.jpg";
+},{}],"model.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.model = void 0;
+
+var _image = _interopRequireDefault(require("./assets/image.jpg"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var text = "JavaScript is the most beautifull programming language";
 var model = [{
   type: "title",
-  value: "Hello World from JS"
+  value: "Contstructor sites on Vanilla JS",
+  options: {
+    tag: "h2",
+    // styles: `background: ; color: #fff; text-align: center; padding: 1.5rem;`,#
+    styles: {
+      background: "linear-gradient(to right, #ff0099, #493240)",
+      color: "#fff",
+      "text-align": "center",
+      padding: "1.5rem"
+    }
+  }
 }, {
   type: "text",
-  value: "here we go with some text"
+  value: text,
+  options: {
+    styles: {
+      background: "linear-gradient(to left, #f2994a, #f2c94c)",
+      padding: "1rem",
+      "font-weight": "bold"
+    }
+  }
 }, {
   type: "columns",
-  value: ["111111111111111", "222222222222222", "333333333333333"]
+  value: ["Javascript application on vanilla JavaScrapt code create by TakumiFuji from Kaliningrad", "JavaScript hero in this world", "JavaScript - it's simple and interesting!"],
+  options: {
+    styles: {
+      background: "linear-gradient(to bottom, #8e2de2, #4a00e0)",
+      padding: "2rem",
+      color: "#fff",
+      "font-weight": "bold"
+    }
+  }
 }, {
   type: "image",
-  value: "./assets/image.jpg"
+  value: _image.default,
+  options: {
+    styles: {
+      padding: "2rem",
+      display: "flex",
+      "justify-content": "center"
+    },
+    imageStyles: {
+      width: "500px",
+      height: "auto"
+    },
+    alt: "This is image"
+  }
 }];
 exports.model = model;
+},{"./assets/image.jpg":"assets/image.jpg"}],"utils.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.col = col;
+exports.css = css;
+exports.row = row;
+
+function row(content) {
+  var styles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+  return "<div class=\"row\" style=\"".concat(styles, "\">").concat(content, "</div>");
+}
+
+function col(content) {
+  return "<div class=\"col-sm\">".concat(content, "</div>");
+}
+
+function css() {
+  var styles = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  var toString = function toString(key) {
+    return "".concat(key, ": ").concat(styles[key]);
+  };
+
+  return Object.keys(styles).map(toString).join(";");
+}
 },{}],"templates.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.columns = columns;
-exports.image = image;
-exports.text = text;
-exports.title = title;
+exports.templates = void 0;
+
+var _utils = require("./utils");
 
 function title(block) {
-  return "  <div class=\"row\">\n                  <div class=\"col-sm\">\n                       <h1>".concat(block.value, "</h1>\n                  </div>\n              </div>");
+  var _block$options = block.options,
+      _block$options$tag = _block$options.tag,
+      tag = _block$options$tag === void 0 ? "h1" : _block$options$tag,
+      styles = _block$options.styles;
+  return (0, _utils.row)((0, _utils.col)("<".concat(tag, ">").concat(block.value, "<").concat(tag)), (0, _utils.css)(styles));
 }
 
 function text(block) {
-  return "<div class=\"row\">\n                    <div class=\"col-sm\">\n                       <p>".concat(block.value, "</p>\n                     </div>\n                </div> ");
+  return (0, _utils.row)((0, _utils.col)("<p>".concat(block.value, "</p>")), (0, _utils.css)(block.options.styles));
 }
 
 function columns(block) {
-  var html = block.value.map(function (item) {
-    return "<div class=\"col-sm\">".concat(item, "</div>");
-  });
-  return "\n    <div class=\"row\">\n    ".concat(html.join(""), "\n    </div>");
+  var styles = block.options.styles;
+  var html = block.value.map(_utils.col).join("");
+  return (0, _utils.row)(html, (0, _utils.css)(block.options.styles));
 }
 
 function image(block) {
-  return "\n      <div class='row'>\n      <img  class='img'src='".concat(block.value, "'\n      </div>");
+  var _block$options2 = block.options,
+      is = _block$options2.imageStyles,
+      _block$options2$alt = _block$options2.alt,
+      alt = _block$options2$alt === void 0 ? "" : _block$options2$alt,
+      styles = _block$options2.styles;
+  return (0, _utils.row)("<img  class='img'src='".concat(block.value, "' alt='").concat(alt, "' style='").concat((0, _utils.css)(is), "'"), (0, _utils.css)(styles));
 }
-},{}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+
+var templates = {
+  title: title,
+  text: text,
+  image: image,
+  columns: columns
+};
+exports.templates = templates;
+},{"./utils":"utils.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 
 function getBundleURLCached() {
@@ -251,19 +339,11 @@ require("./styles/style.css");
 var $site = document.querySelector("#site");
 
 _model.model.forEach(function (block) {
-  var html = "";
+  var toHTML = _templates.templates[block.type];
 
-  if (block.type === "title") {
-    html = (0, _templates.title)(block);
-  } else if (block.type === "text") {
-    html = (0, _templates.text)(block);
-  } else if (block.type === "columns") {
-    html = (0, _templates.columns)(block);
-  } else if (block.type === "image") {
-    html = (0, _templates.image)(block);
+  if (toHTML) {
+    $site.insertAdjacentHTML("beforeend", toHTML(block));
   }
-
-  $site.insertAdjacentHTML("beforeend", html);
 });
 },{"./model":"model.js","./templates":"templates.js","./styles/style.css":"styles/style.css"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -293,7 +373,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62184" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63734" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
